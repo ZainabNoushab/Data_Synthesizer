@@ -7,10 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/11d4-AM7ctk1Lrf7cwjJZu3v4WLJgWMEJ
 """
 
-!pip install sdv
-
-!pip install streamlit
-
 import streamlit as st
 import pandas as pd
 from sdv.single_table import CTGANSynthesizer
