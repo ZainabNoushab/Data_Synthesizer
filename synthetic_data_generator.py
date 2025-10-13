@@ -177,21 +177,40 @@ elif st.session_state.view == 'generate':
                 else:
                     st.warning("No categorical columns found.")
 
-            # CTGAN Parameters
-            st.subheader("CTGAN Configuration")
-            data_type = st.selectbox(
-                "Data Type",
-                ["Mixed", "Numerical", "Categorical"],
-                help="Select to guide preprocessing (auto-detected otherwise)."
-            )
+           # ---- Model Selection ----
+           st.subheader("Model Selection")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                epochs = st.number_input("Epochs", min_value=50, max_value=1000, value=300, help="Training iterations (higher = better quality).")
-                batch_size = st.number_input("Batch Size", min_value=100, max_value=2000, value=500, help="Samples per training batch.")
-            with col2:
-                generator_decay = st.number_input("Generator Decay", min_value=1e-7, max_value=1e-3, value=1e-6, step=1e-7, format="%.1e", help="Weight decay for generator.")
-                accuracy_threshold = st.number_input("Embedding Dim (Accuracy)", min_value=10, max_value=200, value=128, help="Higher for better accuracy in distributions.")
+           model_type = st.selectbox(
+               "Select Synthesizer Model",
+               ["CTGAN (Deep Learning)", "GaussianCopula (Statistical)"],
+               help="Choose whether to use a neural network (CTGAN) or a simpler statistical model."
+           )
+
+           if "CTGAN" in model_type:
+               # Only show CTGAN settings if user selects CTGAN
+               st.subheader("CTGAN Configuration")
+               data_type = st.selectbox(
+                   "Data Type",
+                   ["Mixed", "Numerical", "Categorical"],
+                   help="Select to guide preprocessing (auto-detected otherwise).
+                )
+               col1, col2 = st.columns(2)
+               with col1:
+                   epochs = st.number_input("Epochs", min_value=50, max_value=1000, value=300, help="Training iterations (higher = better quality).")
+                   batch_size = st.number_input("Batch Size", min_value=100, max_value=2000, value=500, help="Samples per training batch."
+               with col2:
+                   generator_decay = st.number_input("Generator Decay", min_value=1e-7, max_value=1e-3, value=1e-6, step=1e-7, format="%.1e", help="Weight decay for generator.")
+                   accuracy_threshold = st.number_input("Embedding Dim (Accuracy)", min_value=10, max_value=200, value=128, help="Higher for better accuracy."
+            
+           else:
+               # Show this if user selects Statistical model
+               st.subheader("Statistical Model Configuration")
+               st.info("""
+               **GaussianCopulaSynthesizer** is a fast, statistical approach.
+               It models column distributions and correlations without neural networks.
+               No extra parameters are required — just upload and generate!
+               """)
+
             # Generate Button
             if st.button("Generate Synthetic Data", help="Train CTGAN and create synthetic dataset"):
                 df = st.session_state.df
