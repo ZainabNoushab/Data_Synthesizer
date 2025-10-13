@@ -17,12 +17,12 @@ try:
     # New SDV versions (>=1.0)
     from sdv.single_table import CTGANSynthesizer
     from sdv.metadata import SingleTableMetadata
-    st.write("✅ Using modern SDV (single_table).")
+    st.write("Using modern SDV (single_table).")
 except ModuleNotFoundError:
     # Old SDV versions (<1.0)
     from sdv.tabular import CTGAN as CTGANSynthesizer
     SingleTableMetadata = None
-    st.warning("⚠️ Using legacy SDV version (tabular). Some metadata features may be limited.")
+    st.warning("Using legacy SDV version (tabular). Some metadata features may be limited.")
 
 # ---- Streamlit page setup ----
 st.set_page_config(page_title="Synthetic Data Generation App", layout="wide")
@@ -49,7 +49,7 @@ st.markdown("""
 
 # If you have a logo image: st.image("logo.png", width=200) or URL: st.image("https://your-logo-url.com/logo.png")
 # Sidebar Navigation
-st.sidebar.title("🌐 Navigation")
+st.sidebar.title("Navigation")
 pages = ["Home", "About", "Generate", "Post-Processing"]
 for page in pages:
     if st.sidebar.button(page, key=page, help=f"Navigate to {page} page"):
@@ -61,7 +61,7 @@ st.sidebar.info("Select a page to explore the app.")
 # Main Content Based on View
 if st.session_state.view == 'home':
     # Home Page
-    st.header("🏠 Welcome to Synthetic Data Generation App")
+    st.header("Welcome to Synthetic Data Generation App")
     st.markdown("""
     This app enables secure and realistic synthetic data creation using CTGAN,
     ideal for privacy-preserving analytics and machine learning.
@@ -81,7 +81,7 @@ if st.session_state.view == 'home':
     st.info("Navigate using the sidebar. Start with **Generate** to upload your data!")
 elif st.session_state.view == 'about':
     # About Page
-    st.header("ℹ️ About This App")
+    st.header("About This App")
     st.markdown("""
     ### Overview
     Built for synthetic data generation, this app leverages the **CTGAN (Conditional Tabular GAN)** model from the SDV library to create
@@ -117,7 +117,7 @@ elif st.session_state.view == 'about':
 
 elif st.session_state.view == 'generate':
     # Generate Page
-    st.header("🔄 Synthetic Data Generation")
+    st.header("Synthetic Data Generation")
     st.info("Upload your dataset and generate synthetic data using CTGAN.")
 
     # File Upload
@@ -141,7 +141,7 @@ elif st.session_state.view == 'generate':
             st.success(f"Dataset loaded: {df.shape[0]} rows, {df.shape[1]} columns")
 
             # Data Summary & Display
-            st.subheader("📊 Data Summary")
+            st.subheader("Data Summary")
 
             # Info: Rows, Columns, Missing
             col1, col2, col3 = st.columns(3)
@@ -256,7 +256,7 @@ elif st.session_state.view == 'generate':
         st.info("Upload a file to begin generation.")
 elif st.session_state.view == 'post_processing':
     # Post-Processing Page
-    st.header("🛠️ Post-Processing & Validation")
+    st.header("Post-Processing & Validation")
     st.info("Refine your synthetic data and validate quality.")
 
     if st.session_state.synthetic_df is None:
