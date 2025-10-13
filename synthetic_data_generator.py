@@ -7,17 +7,35 @@ Original file is located at
     https://colab.research.google.com/drive/11d4-AM7ctk1Lrf7cwjJZu3v4WLJgWMEJ
 """
 
+# -*- coding: utf-8 -*-
+"""Synthetic_Data_Generator"""
+
+# ---- Install dependencies (optional when deployed) ----
+# You can keep these for local runs; Streamlit Cloud uses requirements.txt
+# !pip install sdv streamlit plotly pillow openpyxl pandas numpy
+
 import streamlit as st
 import pandas as pd
-from sdv.single_table import CTGANSynthesizer
-from sdv.metadata import SingleTableMetadata
 import numpy as np
 import plotly.express as px
 import io
-from PIL import Image  # For logo if local
+from PIL import Image
 
-# Page config
+# ---- Handle SDV version compatibility ----
+try:
+    # New SDV versions (>=1.0)
+    from sdv.single_table import CTGANSynthesizer
+    from sdv.metadata import SingleTableMetadata
+    st.write("✅ Using modern SDV (single_table).")
+except ModuleNotFoundError:
+    # Old SDV versions (<1.0)
+    from sdv.tabular import CTGAN as CTGANSynthesizer
+    SingleTableMetadata = None
+    st.warning("⚠️ Using legacy SDV version (tabular). Some metadata features may be limited.")
+
+# ---- Streamlit page setup ----
 st.set_page_config(page_title="Synthetic Data Generation App", layout="wide")
+
 # Initialize session state
 if 'view' not in st.session_state:
     st.session_state.view = 'home'
