@@ -350,5 +350,3 @@ elif st.session_state.view == 'post_processing':
                 "synthetic_data.csv",
                 help="Download without post-processing."
             )
-
-!pip install plotly
