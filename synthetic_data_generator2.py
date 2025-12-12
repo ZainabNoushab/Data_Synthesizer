@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Synthetic Data Generator Improved — Fully Working Version"""
+"""Synthetic Data Generator Improved — Fully Working Version with Sidebar UI"""
 
 import streamlit as st
 import pandas as pd
@@ -25,6 +25,7 @@ except:
 
 # --- Streamlit setup ---
 st.set_page_config(page_title="Synthetic Data Generator", layout="wide")
+st.title("🔬 Synthetic Data Generator")
 
 # --- Session state init ---
 for key in ['df', 'synthetic_df', 'combined_df', 'metadata', 'processed_df']:
@@ -46,10 +47,13 @@ def safe_generate_synthetic(model, n_samples):
         return None
     return synthetic
 
-# --- App UI ---
-tabs = st.tabs(["Upload", "Preprocess", "Generate", "Validate", "Post-process"])
+# --- Sidebar navigation ---
+st.sidebar.header("Navigation")
+page = st.sidebar.radio("Go to", ["Upload", "Preprocess", "Generate", "Validate", "Post-process"])
 
-with tabs[0]:
+# --- Pages ---
+
+if page == "Upload":
     st.header("Upload Dataset")
     uploaded_file = st.file_uploader("Upload CSV or Excel", type=['csv','xlsx','xls'])
     if uploaded_file:
@@ -61,31 +65,29 @@ with tabs[0]:
         st.success(f"Loaded dataset: {df.shape[0]} rows x {df.shape[1]} cols")
         st.dataframe(df.head(10))
 
-with tabs[1]:
+elif page == "Preprocess":
     st.header("Preprocessing")
     df = st.session_state.df
     if df is not None:
-        # Drop datetime-like columns
         unsuitable_cols = [c for c in df.columns if 'date' in c.lower() or 'time' in c.lower() or pd.api.types.is_datetime64_any_dtype(df[c])]
         if unsuitable_cols:
             df = df.drop(columns=unsuitable_cols)
             st.warning(f"Dropped datetime/time columns: {unsuitable_cols}")
-        # Drop missing
         df = df.dropna()
         st.session_state.df = df
         st.success(f"Preprocessed dataset: {df.shape[0]} rows x {df.shape[1]} cols")
         st.dataframe(df.head(10))
 
-with tabs[2]:
+elif page == "Generate":
     st.header("Generate Synthetic Data")
     df = st.session_state.df
     if df is not None and df.shape[0]>0:
-        model_type = st.selectbox("Choose Synthesizer", ["CTGAN", "GaussianCopula"])
+        model_type = st.sidebar.selectbox("Choose Synthesizer", ["CTGAN", "GaussianCopula"])
         if model_type == "CTGAN":
-            epochs = st.number_input("Epochs", 50, 1000, 300)
-            batch_size = st.number_input("Batch Size", 100, 2000, 500)
-            embedding_dim = st.number_input("Embedding Dim", 10, 200, 128)
-            generator_decay = st.number_input("Generator Decay", 1e-7, 1e-3, 1e-6, format="%.1e")
+            epochs = st.sidebar.number_input("Epochs", 50, 1000, 300)
+            batch_size = st.sidebar.number_input("Batch Size", 100, 2000, 500)
+            embedding_dim = st.sidebar.number_input("Embedding Dim", 10, 200, 128)
+            generator_decay = st.sidebar.number_input("Generator Decay", 1e-7, 1e-3, 1e-6, format="%.1e")
 
         if st.button("Generate"):
             metadata = SingleTableMetadata() if SingleTableMetadata else None
@@ -103,14 +105,13 @@ with tabs[2]:
                     st.session_state.synthetic_df = synthetic_df
                     st.success("Synthetic data generated")
                     st.dataframe(synthetic_df.head(10))
-                    # Combine
                     combined = pd.concat([df.reset_index(drop=True), synthetic_df.reset_index(drop=True)], ignore_index=True)
                     combined['source'] = ['original']*len(df) + ['synthetic']*len(synthetic_df)
                     st.session_state.combined_df = combined
             except Exception as e:
                 st.error(f"Generation failed: {e}")
 
-with tabs[3]:
+elif page == "Validate":
     st.header("Validate")
     combined = st.session_state.combined_df
     df = st.session_state.df
@@ -119,7 +120,7 @@ with tabs[3]:
         numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
         cat_cols = df.select_dtypes(include=['object','category']).columns.tolist()
         if numeric_cols:
-            col = st.selectbox("Select numeric column", numeric_cols)
+            col = st.sidebar.selectbox("Select numeric column for KS & KDE", numeric_cols)
             ks_stat, p_val = ks_2samp(df[col], synthetic_df[col])
             st.write(f"KS Test: stat={ks_stat:.4f}, p={p_val:.4f}")
             fig, ax = plt.subplots()
@@ -128,11 +129,11 @@ with tabs[3]:
             ax.legend()
             st.pyplot(fig)
         if cat_cols:
-            cat_col = st.selectbox("Select categorical column", cat_cols)
+            cat_col = st.sidebar.selectbox("Select categorical column for histogram", cat_cols)
             fig = px.histogram(combined, x=cat_col, color='source', barmode='group')
             st.plotly_chart(fig)
 
-with tabs[4]:
+elif page == "Post-process":
     st.header("Post-process & Download")
     combined = st.session_state.combined_df
     if combined is not None:
@@ -142,3 +143,4 @@ with tabs[4]:
         csv_buf = io.StringIO()
         processed.to_csv(csv_buf, index=False)
         st.download_button("Download CSV", csv_buf.getvalue(), "synthetic_data_final.csv")
+
