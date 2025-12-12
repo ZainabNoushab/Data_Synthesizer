@@ -55,7 +55,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("synthetic_data_app")
 
 # ---- Streamlit page config ----
-st.set_page_config(page_title="Synthetic Data Generator — Improved", layout="wide")
+st.set_page_config(page_title="Synthetic Data Generator", layout="wide")
 
 # ---- Utility functions ----
 
@@ -399,4 +399,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
