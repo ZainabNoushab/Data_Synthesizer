@@ -258,7 +258,7 @@ def generate_tab():
                 synthesizer.fit(df)
 
             with st.spinner("Sampling synthetic data..."):
-                synthetic_df = synthesizer.sample(sample_size)
+                synthetic_df = safe_generate_synthetic(synthesizer, len(df))
 
             st.session_state['synthetic_df'] = synthetic_df
             st.success(f"Synthetic dataset generated: {synthetic_df.shape[0]} rows x {synthetic_df.shape[1]} cols")
@@ -372,6 +372,24 @@ def postprocess_tab():
         final_df.to_csv(csv_buf, index=False)
         st.download_button("Download final CSV", csv_buf.getvalue(), file_name="synthetic_data_final.csv")
 
+# --- Safe Synthetic Generation Wrapper ---
+def safe_generate_synthetic(model, n_samples):
+    import streamlit as st
+    if model is None:
+        st.error("Generation failed: No trained model found. Train a model first.")
+        return None
+
+    try:
+        synthetic = model.sample(n_samples)
+    except Exception as e:
+        st.error(f"Generation failed during sampling: {e}")
+        return None
+
+    if synthetic is None:
+        st.error("Generation failed: model returned None. Training likely failed or dataset was invalid.")
+        return None
+
+    return synthetic
 
 def main():
     sidebar_info()
@@ -399,5 +417,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
