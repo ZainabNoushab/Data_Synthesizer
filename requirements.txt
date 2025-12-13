@@ -9,3 +9,8 @@ Pillow
 sdv
 openpyxl
 xlrd
+torch
+faker
+rdt
+imbalanced-learn
+tabulate
