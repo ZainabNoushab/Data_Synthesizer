@@ -170,7 +170,7 @@ elif page == "Validate":
             st.pyplot(fig)
 
         # ---------- STATISTICAL SUMMARY ----------
-        st.subheader(Statistical Summary")
+        st.subheader("Statistical Summary")
 
         summary_original = df[numeric_cols].describe().T
         summary_synthetic = synthetic_df[numeric_cols].describe().T
