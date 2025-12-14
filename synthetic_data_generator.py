@@ -144,7 +144,7 @@ elif page == "Generate":
 # PAGE 4: VALIDATE (STEP 9 COMPLETE)
 # ==================================================
 elif page == "Validate":
-    st.header("Validation & Step 9 Statistical Analysis")
+    st.header("Validation & Statistical Analysis")
 
     df = st.session_state.df
     synthetic_df = st.session_state.synthetic_df
@@ -169,8 +169,8 @@ elif page == "Validate":
             ax.legend()
             st.pyplot(fig)
 
-        # ---------- STEP 9A: STATISTICAL SUMMARY ----------
-        st.subheader("Step 9A: Statistical Summary (Describe)")
+        # ---------- STATISTICAL SUMMARY ----------
+        st.subheader(Statistical Summary")
 
         summary_original = df[numeric_cols].describe().T
         summary_synthetic = synthetic_df[numeric_cols].describe().T
@@ -181,8 +181,8 @@ elif page == "Validate":
         summary_table = pd.concat([summary_original, summary_synthetic])
         st.dataframe(summary_table)
 
-        # ---------- STEP 9B: MEAN & STD ----------
-        st.subheader("Step 9B: Mean & Standard Deviation Comparison")
+        # ---------- MEAN & STD ----------
+        st.subheader("Mean & Standard Deviation Comparison")
 
         stats_table = []
         for col in numeric_cols:
@@ -196,9 +196,9 @@ elif page == "Validate":
 
         st.dataframe(pd.DataFrame(stats_table))
 
-        # ---------- STEP 9C: CORRELATION ----------
+        # ---------- CORRELATION ----------
         if len(numeric_cols) > 1:
-            st.subheader("Step 9C: Correlation Difference Matrix")
+            st.subheader("Correlation Difference Matrix")
 
             corr_diff = (df[numeric_cols].corr() - synthetic_df[numeric_cols].corr()).abs()
             st.dataframe(corr_diff)
